@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="bi bi-book"></i>
+                    Book Management System
+                </h1>
+            </div>
+        </div>
+
+        <!-- Alert for messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Add Book Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-plus-circle"></i>
+                            Add New Book
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="addBookForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="bookTitle" class="form-label">Title *</label>
+                                    <input type="text" class="form-control" id="bookTitle" name="title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bookAuthor" class="form-label">Author *</label>
+                                    <input type="text" class="form-control" id="bookAuthor" name="author" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="bookISBN" class="form-label">ISBN</label>
+                                    <input type="text" class="form-control" id="bookISBN" name="isbn">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bookGenre" class="form-label">Genre</label>
+                                    <input type="text" class="form-control" id="bookGenre" name="genre">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="bookPublishedYear" class="form-label">Published Year</label>
+                                    <input type="number" class="form-control" id="bookPublishedYear" name="publishedYear" min="1000" max="2024">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bookDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="bookDescription" name="description" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus"></i>
+                                Add Book
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Books Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-table"></i>
+                            Books Library
+                        </h3>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadBooks()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="loadingSpinner" class="text-center d-none">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading books...</p>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="booksTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>ISBN</th>
+                                        <th>Genre</th>
+                                        <th>Published Year</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="booksTableBody">
+                                    <!-- Books will be loaded here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="noBooksMessage" class="text-center mt-4 d-none">
+                            <i class="bi bi-book text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No books found. Add some books to get started!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        const API_BASE_URL = 'https://bookapi-jbounsa-g6d0f0gsc8cee9em.centralus-01.azurewebsites.net/api/books';
+
+        // Show alert messages
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            alertContainer.innerHTML = alertHtml;
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = alertContainer.querySelector('.alert');
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        }
+
+        // Show/hide loading spinner
+        function toggleLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            const table = document.getElementById('booksTable');
+            const noBooks = document.getElementById('noBooksMessage');
+            
+            if (show) {
+                spinner.classList.remove('d-none');
+                table.classList.add('d-none');
+                noBooks.classList.add('d-none');
+            } else {
+                spinner.classList.add('d-none');
+                table.classList.remove('d-none');
+            }
+        }
+
+        // Load books from API
+        async function loadBooks() {
+            toggleLoading(true);
+            
+            try {
+                const response = await fetch(API_BASE_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const books = await response.json();
+                displayBooks(books);
+                
+                if (books.length === 0) {
+                    document.getElementById('noBooksMessage').classList.remove('d-none');
+                    document.getElementById('booksTable').classList.add('d-none');
+                }
+                
+            } catch (error) {
+                console.error('Error loading books:', error);
+                showAlert('Failed to load books from server. Please check your internet connection or try again later.', 'danger');
+                
+                // Show sample data for demonstration
+                const sampleBooks = [
+                    {
+                        id: 1,
+                        title: "To Kill a Mockingbird",
+                        author: "Harper Lee",
+                        isbn: "978-0-06-112008-4",
+                        genre: "Fiction",
+                        publishedYear: 1960,
+                        description: "A gripping tale of racial injustice and childhood innocence."
+                    },
+                    {
+                        id: 2,
+                        title: "1984",
+                        author: "George Orwell",
+                        isbn: "978-0-452-28423-4",
+                        genre: "Dystopian Fiction",
+                        publishedYear: 1949,
+                        description: "A dystopian social science fiction novel about totalitarian rule."
+                    }
+                ];
+                displayBooks(sampleBooks);
+                showAlert('Showing sample data due to API connection issues.', 'warning');
+            }
+            
+            toggleLoading(false);
+        }
+
+        // Display books in table
+        function displayBooks(books) {
+            const tbody = document.getElementById('booksTableBody');
+            tbody.innerHTML = '';
+
+            books.forEach(book => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${book.id}</td>
+                    <td class="fw-bold">${book.title || 'N/A'}</td>
+                    <td>${book.author || 'N/A'}</td>
+                    <td>${book.isbn || 'N/A'}</td>
+                    <td>
+                        ${book.genre ? `<span class="badge bg-secondary">${book.genre}</span>` : 'N/A'}
+                    </td>
+                    <td>${book.publishedYear || 'N/A'}</td>
+                    <td class="text-truncate" style="max-width: 200px;" title="${book.description || 'No description'}">
+                        ${book.description || 'No description available'}
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteBook(${book.id})" title="Delete book">
+                            <i class="bi bi-trash"></i>
+                            Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Delete book
+        async function deleteBook(bookId) {
+            if (!confirm('Are you sure you want to delete this book?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${bookId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('Book deleted successfully!', 'success');
+                    loadBooks(); // Reload books
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error deleting book:', error);
+                showAlert('Failed to delete book. Please try again.', 'danger');
+            }
+        }
+
+        // Add new book
+        async function addBook(bookData) {
+            try {
+                const response = await fetch(API_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (response.ok) {
+                    showAlert('Book added successfully!', 'success');
+                    document.getElementById('addBookForm').reset();
+                    loadBooks(); // Reload books
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error adding book:', error);
+                showAlert('Failed to add book. Please try again.', 'danger');
+            }
+        }
+
+        // Form submission handler
+        document.getElementById('addBookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const bookData = {
+                title: formData.get('title'),
+                author: formData.get('author'),
+                isbn: formData.get('isbn') || null,
+                genre: formData.get('genre') || null,
+                publishedYear: formData.get('publishedYear') ? parseInt(formData.get('publishedYear')) : null,
+                description: formData.get('description') || null
+            };
+
+            addBook(bookData);
+        });
+
+        // Load books when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBooks();
+        });
+    </script>
+</body>
+</html>

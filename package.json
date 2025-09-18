@@ -1,0 +1,30 @@
+{
+  "name": "book-api-frontend",
+  "version": "1.0.0",
+  "description": "HTML frontend application for Book Management System",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 server.py",
+    "serve": "python3 server.py",
+    "dev": "python3 server.py"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "bootstrap",
+    "books",
+    "api",
+    "frontend"
+  ],
+  "author": "Book Management System",
+  "license": "MIT",
+  "homepage": ".",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaybounsavy/book_api_frontend.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
