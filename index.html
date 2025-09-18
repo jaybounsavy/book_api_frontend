@@ -48,22 +48,18 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="bookISBN" class="form-label">ISBN</label>
-                                    <input type="text" class="form-control" id="bookISBN" name="isbn">
+                                    <label for="bookLanguage" class="form-label">Language</label>
+                                    <input type="text" class="form-control" id="bookLanguage" name="language">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="bookGenre" class="form-label">Genre</label>
-                                    <input type="text" class="form-control" id="bookGenre" name="genre">
+                                    <label for="bookPages" class="form-label">Number of Pages</label>
+                                    <input type="number" class="form-control" id="bookPages" name="no_of_pages" min="1">
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="bookPublishedYear" class="form-label">Published Year</label>
-                                    <input type="number" class="form-control" id="bookPublishedYear" name="publishedYear" min="1000" max="2024">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="bookDescription" class="form-label">Description</label>
-                                    <textarea class="form-control" id="bookDescription" name="description" rows="2"></textarea>
+                                    <label for="bookPublishedDate" class="form-label">Published Date</label>
+                                    <input type="number" class="form-control" id="bookPublishedDate" name="published_date" min="1000" max="2024">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">
@@ -105,10 +101,9 @@
                                         <th>ID</th>
                                         <th>Title</th>
                                         <th>Author</th>
-                                        <th>ISBN</th>
-                                        <th>Genre</th>
-                                        <th>Published Year</th>
-                                        <th>Description</th>
+                                        <th>Language</th>
+                                        <th>Pages</th>
+                                        <th>Published Date</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -202,19 +197,17 @@
                         id: 1,
                         title: "To Kill a Mockingbird",
                         author: "Harper Lee",
-                        isbn: "978-0-06-112008-4",
-                        genre: "Fiction",
-                        publishedYear: 1960,
-                        description: "A gripping tale of racial injustice and childhood innocence."
+                        language: "English",
+                        no_of_pages: 336,
+                        published_date: 1960
                     },
                     {
                         id: 2,
                         title: "1984",
                         author: "George Orwell",
-                        isbn: "978-0-452-28423-4",
-                        genre: "Dystopian Fiction",
-                        publishedYear: 1949,
-                        description: "A dystopian social science fiction novel about totalitarian rule."
+                        language: "English",
+                        no_of_pages: 328,
+                        published_date: 1949
                     }
                 ];
                 displayBooks(sampleBooks);
@@ -235,14 +228,11 @@
                     <td>${book.id}</td>
                     <td class="fw-bold">${book.title || 'N/A'}</td>
                     <td>${book.author || 'N/A'}</td>
-                    <td>${book.isbn || 'N/A'}</td>
                     <td>
-                        ${book.genre ? `<span class="badge bg-secondary">${book.genre}</span>` : 'N/A'}
+                        ${book.language ? `<span class="badge bg-secondary">${book.language}</span>` : 'N/A'}
                     </td>
-                    <td>${book.publishedYear || 'N/A'}</td>
-                    <td class="text-truncate" style="max-width: 200px;" title="${book.description || 'No description'}">
-                        ${book.description || 'No description available'}
-                    </td>
+                    <td>${book.no_of_pages || 'N/A'}</td>
+                    <td>${book.published_date || 'N/A'}</td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="deleteBook(${book.id})" title="Delete book">
                             <i class="bi bi-trash"></i>
@@ -309,10 +299,9 @@
             const bookData = {
                 title: formData.get('title'),
                 author: formData.get('author'),
-                isbn: formData.get('isbn') || null,
-                genre: formData.get('genre') || null,
-                publishedYear: formData.get('publishedYear') ? parseInt(formData.get('publishedYear')) : null,
-                description: formData.get('description') || null
+                language: formData.get('language') || null,
+                no_of_pages: formData.get('no_of_pages') ? parseInt(formData.get('no_of_pages')) : null,
+                published_date: formData.get('published_date') ? parseInt(formData.get('published_date')) : null
             };
 
             addBook(bookData);
