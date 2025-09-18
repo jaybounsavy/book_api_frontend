@@ -52,10 +52,9 @@ The application expects books to have the following structure:
   "id": 1,
   "title": "Book Title",
   "author": "Author Name", 
-  "isbn": "978-0-123-45678-9",
-  "genre": "Fiction",
-  "publishedYear": 2023,
-  "description": "Book description..."
+  "language": "English",
+  "no_of_pages": 336,
+  "published_date": 1960
 }
 ```
 
